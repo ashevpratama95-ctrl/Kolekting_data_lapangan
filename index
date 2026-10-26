@@ -1,0 +1,2470 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0D5DA6">
+  <title>Kolekting Data Lapangan | PLN Electricity Services</title>
+
+  <!-- FONT & LIBRARY BA -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    /* ===== RESET & VARIABEL ===== */
+    * {
+      -webkit-tap-highlight-color: transparent !important;
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    button {
+      outline: none !important;
+      border: none;
+      background: none;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      -webkit-appearance: none;
+      font-family: inherit;
+    }
+    
+    button:focus, button:active {
+      outline: none !important;
+      box-shadow: none !important;
+    }
+
+    :root {
+      --blue: #0D5DA6;
+      --blue-dark: #093E6F;
+      --blue-light: #e6f0f9;
+      --cyan: #06B6D4;
+      --cyan-light: #cffafe;
+      --yellow: #F59E0B;
+      --yellow-light: #fef3c7;
+      --green: #10b981;
+      --green-dark: #059669;
+      --green-light: #ecfdf5;
+      --red: #ef4444;
+      --bg: #f3f6fb;
+      --bg-card: #ffffff;
+      --bg-input: #f1f5f9;
+      --text: #172b4d;
+      --muted: #718096;
+      --border: #e2e8f0;
+      --radius: 18px;
+      --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.12);
+    }
+
+    body.dark-mode {
+      --bg: #0b1220;
+      --bg-card: #1e293b;
+      --bg-input: #0f172a;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --border: rgba(255,255,255,0.1);
+      --shadow-card: 0 8px 30px rgba(0, 0, 0, 0.6);
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', Arial, sans-serif;
+      font-size: 14px;
+      -webkit-font-smoothing: antialiased;
+      display: flex;
+      justify-content: center;
+      overflow: hidden;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 100%;
+      background: var(--bg);
+      height: 100vh;
+      height: 100dvh;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+    }
+
+    /* ===== TOPBAR BA ===== */
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 10px 16px;
+      background: linear-gradient(115deg, #093E6F, #0D5DA6 65%, #1A72C4);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      flex-shrink: 0;
+    }
+
+    .theme-toggle-neu {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .switch-neu {
+      position: relative;
+      display: inline-block;
+      width: 105px;
+      height: 28px;
+      flex-shrink: 0;
+    }
+
+    .switch-neu input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      position: absolute;
+    }
+
+    .slider-neu {
+      position: absolute;
+      inset: 0;
+      background-color: #e2e8f0;
+      border-radius: 30px;
+      transition: all 0.4s ease;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: inset 2px 2px 5px rgba(0,0,0,0.1), inset -2px -2px 5px rgba(255,255,255,0.8);
+    }
+
+    .switch-neu input:checked + .slider-neu {
+      background-color: #1e293b;
+      box-shadow: inset 3px 3px 6px rgba(0,0,0,0.5), inset -1px -1px 4px rgba(255,255,255,0.1);
+    }
+
+    .mode-text-neu {
+      font-size: 9px;
+      font-weight: 800;
+      white-space: nowrap;
+      pointer-events: none;
+      transition: all 0.3s ease;
+      z-index: 1;
+      letter-spacing: 0.5px;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .mode-text-neu.dark {
+      color: #64748b;
+      opacity: 0;
+      left: 12px;
+    }
+
+    .mode-text-neu.light {
+      color: #94a3b8;
+      opacity: 1;
+      right: 12px;
+    }
+
+    .switch-neu input:checked + .slider-neu .mode-text-neu.light {
+      opacity: 0;
+    }
+
+    .switch-neu input:checked + .slider-neu .mode-text-neu.dark {
+      opacity: 1;
+    }
+
+    .thumb-neu {
+      position: absolute;
+      height: 24px;
+      width: 24px;
+      left: 2px;
+      top: 2px;
+      background-color: #fff;
+      transition: all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 1px 1px 4px rgba(0,0,0,0.2);
+      z-index: 2;
+    }
+
+    .switch-neu input:checked + .slider-neu .thumb-neu {
+      transform: translateX(77px);
+    }
+
+    .thumb-neu svg {
+      position: absolute;
+      width: 13px;
+      height: 13px;
+      transition: all 0.3s ease;
+    }
+
+    .thumb-neu .icon-sun-neu {
+      color: #94a3b8;
+      opacity: 1;
+      transform: rotate(0deg) scale(1);
+    }
+
+    .thumb-neu .icon-moon-neu {
+      color: #94a3b8;
+      opacity: 0;
+      transform: rotate(-90deg) scale(0.5);
+    }
+
+    .switch-neu input:checked + .slider-neu .thumb-neu .icon-sun-neu {
+      opacity: 0;
+      transform: rotate(90deg) scale(0.5);
+    }
+
+    .switch-neu input:checked + .slider-neu .thumb-neu .icon-moon-neu {
+      opacity: 1;
+      transform: rotate(0deg) scale(1);
+    }
+
+    .top-bar-profile {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+      margin-left: auto;
+    }
+
+    .top-bar-text {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      text-align: right;
+      line-height: 1.15;
+    }
+
+    .top-bar-role {
+      font-size: 8px;
+      font-weight: 600;
+      color: #a8d1ff;
+      letter-spacing: 0.5px;
+    }
+
+    .top-bar-name {
+      font-size: 11px;
+      font-weight: 800;
+      color: #fff;
+      white-space: nowrap;
+      margin-top: 1px;
+    }
+
+    .top-bar-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    /* ===== HEADER BA ===== */
+    .sticky-header {
+      position: relative;
+      flex-shrink: 0;
+      background: var(--bg);
+    }
+
+    .topbar-biru {
+      background: linear-gradient(115deg, #093E6F, #0D5DA6 65%, #1A72C4);
+      color: #fff;
+      padding: 25px 24px 45px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+    }
+
+    .brand-mark {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 65px;
+      flex-shrink: 0;
+    }
+
+    .brand-mark img {
+      height: 130%;
+      width: auto;
+      object-fit: contain;
+      display: block;
+      border-radius: 6px;
+    }
+
+    .brand-text {
+      text-align: right;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+
+    .brand-title {
+      font-size: clamp(20px, 4vw, 30px);
+      font-weight: 800;
+      color: #fff;
+      margin: 0;
+      line-height: 1.1;
+      letter-spacing: 0.5px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .brand-sub {
+      font-size: 10px;
+      font-weight: 600;
+      color: #a8d1ff;
+      margin: 5px 0 10px;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+    }
+
+    .user-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.25);
+      padding: 6px 12px;
+      border-radius: 50px;
+      backdrop-filter: blur(4px);
+    }
+
+    .user-badge svg {
+      width: 16px;
+      height: 16px;
+      stroke: #a8d1ff;
+      stroke-width: 2.5;
+      flex-shrink: 0;
+    }
+
+    .user-info .name {
+      font-size: 10px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.5px;
+    }
+
+    /* ===== NAV TAB ===== */
+    .mobile-nav {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: var(--bg-card);
+      padding: 4px;
+      border-radius: 14px;
+      position: relative;
+      box-shadow: var(--shadow-card);
+      margin: -20px 10px 16px 10px;
+      z-index: 10;
+    }
+
+    .mobile-nav::before {
+      content: '';
+      position: absolute;
+      top: 4px;
+      bottom: 4px;
+      left: 4px;
+      width: calc(50% - 4px);
+      background: var(--blue);
+      border-radius: 10px;
+      transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+      z-index: 1;
+    }
+
+    .mobile-nav.show-preview::before {
+      transform: translateX(100%);
+    }
+
+    .mobile-nav button {
+      border-radius: 10px;
+      padding: 12px 6px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      position: relative;
+      z-index: 2;
+      transition: color 0.3s ease;
+    }
+
+    .mobile-nav button.active {
+      color: #fff;
+    }
+
+    /* ===== KONTEN AREA ===== */
+    .content-area {
+      padding: 0 10px 20px 10px;
+    }
+
+    .content-page {
+      display: none;
+    }
+
+    .content-page.active {
+      display: block;
+    }
+
+    .panel {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-card);
+      overflow: hidden;
+      margin-bottom: 18px;
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 19px 20px 15px;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .panel-icon {
+      width: 46px;
+      height: 46px;
+      flex-shrink: 0;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--blue-light) 0%, #dbeafe 100%);
+      display: grid;
+      place-items: center;
+      border: 1.5px solid rgba(13, 93, 166, 0.2);
+      box-shadow: 0 3px 8px rgba(13, 93, 166, 0.1);
+    }
+
+    body.dark-mode .panel-icon {
+      background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
+      border-color: rgba(255,255,255,0.1);
+    }
+
+    .panel-icon svg {
+      width: 26px;
+      height: 26px;
+    }
+
+    .panel-title {
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .panel-desc {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+      line-height: 1.5;
+    }
+
+    .panel-body {
+      padding: 19px 20px 21px;
+    }
+
+    /* ===== FIELD INPUT ===== */
+    .field {
+      margin-bottom: 17px;
+    }
+
+    .field:last-child {
+      margin-bottom: 0;
+    }
+
+    .field label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .input-wrap {
+      position: relative;
+    }
+
+    .input-wrap input {
+      width: 100%;
+      height: 45px;
+      border: 1.5px solid var(--border);
+      background: var(--bg-input);
+      border-radius: 11px;
+      padding: 0 42px 0 13px;
+      color: var(--text);
+      font-weight: 600;
+      transition: all 0.3s ease;
+      font-family: inherit;
+      font-size: 14px;
+    }
+
+    .input-wrap input:focus {
+      outline: none;
+      border-color: var(--blue);
+    }
+
+    body.dark-mode .input-wrap input:focus {
+      border-color: #fff;
+    }
+
+    .input-wrap input.input-error {
+      border-color: var(--red) !important;
+      background: rgba(239,68,68,0.05) !important;
+    }
+
+    .input-wrap input::placeholder {
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    .input-wrap input[readonly] {
+      background: #f1f5f9 !important;
+      color: var(--muted);
+      cursor: not-allowed;
+    }
+
+    body.dark-mode .input-wrap input[readonly] {
+      background: #0f172a !important;
+    }
+
+    .clear-input {
+      position: absolute;
+      right: 9px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      color: var(--muted);
+      background: var(--bg);
+      display: none;
+      place-items: center;
+    }
+
+    .clear-input svg {
+      width: 14px;
+      height: 14px;
+      stroke-width: 3;
+    }
+
+    .clear-input.visible {
+      display: grid;
+    }
+
+    /* ===== CUSTOM SELECT ===== */
+    .custom-select-trigger {
+      width: 100%;
+      height: 45px;
+      border: 1.5px solid var(--border);
+      background: var(--bg-input);
+      border-radius: 11px;
+      padding: 0 42px 0 13px;
+      color: var(--text);
+      font-weight: 600;
+      transition: all 0.3s ease;
+      font-family: inherit;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      text-align: left;
+      position: relative;
+    }
+
+    .custom-select-trigger.placeholder {
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    .custom-select-trigger:focus {
+      outline: none;
+      border-color: var(--blue);
+    }
+
+    .custom-select-trigger.input-error {
+      border-color: var(--red) !important;
+      background: rgba(239,68,68,0.05) !important;
+    }
+
+    .custom-select-trigger .chevron {
+      position: absolute;
+      right: 13px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+      stroke: var(--muted);
+      pointer-events: none;
+    }
+
+    /* ===== ERROR TEXT ===== */
+    .error-text {
+      display: none;
+      color: var(--red);
+      font-size: 10px;
+      font-weight: 600;
+      margin-top: 6px;
+      align-items: center;
+      gap: 4px;
+    }
+    .error-text.visible {
+      display: flex;
+    }
+
+    /* ===== ANIMASI SHAKE (TANPA GLOW MERAH) ===== */
+    @keyframes shakeHighlight {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-4px); }
+      40%, 80% { transform: translateX(4px); }
+    }
+    
+    /* Durasi standar (0.6s) untuk IDPEL & FOTO */
+    .highlight-error {
+      animation: shakeHighlight 0.6s ease-in-out;
+      border: 2px solid var(--red) !important;
+    }
+    
+    /* Durasi lebih lama (1.2s) khusus untuk Data Petugas */
+    .highlight-error-lama {
+      animation: shakeHighlight 1.2s ease-in-out;
+      border: 2px solid var(--red) !important;
+    }
+
+    /* ===== UPLOAD BOX ===== */
+    .upload-box {
+      position: relative;
+      min-height: 160px;
+      border: 1.5px dashed var(--border);
+      background: var(--bg-input);
+      border-radius: 13px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 20px;
+      cursor: pointer;
+      overflow: hidden;
+      transition: 0.2s;
+    }
+
+    .upload-box:hover {
+      border-color: var(--blue);
+    }
+
+    .upload-box.upload-error {
+      border-color: var(--red) !important;
+      background: rgba(239,68,68,0.05) !important;
+    }
+
+    .upload-box.has-photo {
+      min-height: auto;
+      padding: 0;
+      border-style: solid;
+      border-color: var(--border);
+      background: #000;
+    }
+
+    .upload-icon {
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .upload-icon svg {
+      width: 48px;
+      height: 48px;
+    }
+
+    .upload-title {
+      font-weight: 500;
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .upload-preview { 
+      display: none; 
+      width: 100%; 
+      height: auto;
+      max-height: 500px;
+      object-fit: contain;
+      border-radius: 12px;
+      background: #000;
+    }
+
+    .upload-box.has-photo .upload-preview {
+      display: block;
+    }
+
+    .corner-clear {
+      display: none;
+      position: absolute;
+      right: 8px;
+      top: 8px;
+      z-index: 3;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #ef4444;
+      color: #fff;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+
+    .corner-clear svg {
+      width: 16px;
+      height: 16px;
+      stroke-width: 3;
+    }
+
+    /* ===== DOWNLOAD BACKUP ===== */
+    .download-backup-wrap {
+      display: none;
+      margin-top: 12px;
+      padding: 12px;
+      background: var(--green-light);
+      border: 1.5px solid rgba(16, 185, 129, 0.3);
+      border-radius: 11px;
+      text-align: center;
+    }
+
+    body.dark-mode .download-backup-wrap {
+      background: rgba(16, 185, 129, 0.1);
+      border-color: rgba(16, 185, 129, 0.4);
+    }
+
+    .download-backup-wrap.visible {
+      display: block;
+    }
+
+    .download-backup-info {
+      font-size: 10.5px;
+      color: var(--green-dark);
+      margin-bottom: 8px;
+      line-height: 1.45;
+    }
+
+    body.dark-mode .download-backup-info {
+      color: #6ee7b7;
+    }
+
+    .btn-download-backup {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      height: 42px;
+      border-radius: 10px;
+      background: var(--green);
+      color: #fff;
+      font-size: 12.5px;
+      font-weight: 800;
+      box-shadow: 0 3px 8px rgba(16,185,129,0.25);
+    }
+
+    .btn-download-backup:hover {
+      background: var(--green-dark);
+    }
+
+    .btn-download-backup svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* ===== GPS INFO ===== */
+    .gps-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--bg-input);
+      border: 1.5px solid var(--border);
+      padding: 12px 14px;
+      border-radius: 11px;
+      margin-top: 12px;
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.4;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.25s ease;
+    }
+
+    .gps-info:hover {
+      border-color: var(--blue);
+    }
+
+    .gps-info:active {
+      transform: scale(0.98);
+    }
+
+    .gps-info.loading {
+      border-color: var(--blue);
+      color: var(--blue);
+      background: var(--blue-light);
+    }
+
+    body.dark-mode .gps-info.loading {
+      background: rgba(13,93,166,0.2);
+      color: #93c5fd;
+    }
+
+    .gps-info.loading .gps-icon-wrap {
+      animation: gpsPulse 1.2s ease-in-out infinite;
+      color: var(--blue);
+    }
+
+    .gps-info.ready {
+      border-color: rgba(13, 93, 166, 0.4);
+      background: var(--blue-light);
+      color: var(--blue);
+    }
+
+    body.dark-mode .gps-info.ready {
+      background: rgba(13, 93, 166, 0.15);
+      color: #93c5fd;
+      border-color: rgba(13, 93, 166, 0.5);
+    }
+
+    .gps-info.ready .gps-icon-wrap {
+      color: var(--blue);
+    }
+
+    .gps-info.error {
+      border-color: rgba(239, 68, 68, 0.5);
+      background: rgba(239, 68, 68, 0.08);
+      color: var(--red);
+    }
+
+    .gps-info.error .gps-icon-wrap {
+      color: var(--red);
+    }
+
+    .gps-icon-wrap {
+      width: 36px;
+      height: 36px;
+      flex-shrink: 0;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: var(--bg-card);
+      transition: all 0.25s ease;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+
+    body.dark-mode .gps-icon-wrap {
+      background: #1e293b;
+    }
+
+    .gps-icon-wrap svg {
+      width: 18px;
+      height: 18px;
+      stroke-width: 2.5;
+    }
+
+    .gps-text {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .gps-text #gpsStatus {
+      font-weight: 800;
+      font-size: 12px;
+      letter-spacing: 0.2px;
+    }
+
+    .gps-text .coords {
+      font-weight: 600;
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      opacity: 0.85;
+    }
+
+    .gps-info.spinning .gps-icon-wrap {
+      animation: gpsPulse 1.2s ease-in-out infinite;
+    }
+
+    .gps-info.spinning {
+      border-color: var(--blue) !important;
+    }
+
+    @keyframes gpsPulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.1); opacity: 0.7; }
+    }
+
+    /* ===== BUTTON PRIMARY ===== */
+    .primary {
+      position: relative;
+      min-height: 46px;
+      padding: 12px 16px;
+      border-radius: 11px;
+      font-size: 13px;
+      font-weight: 800;
+      color: #fff;
+      background: var(--blue);
+      border: 1px solid var(--blue);
+      box-shadow: 0 3px 8px rgba(13,93,166,0.2);
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .primary:hover {
+      background: var(--blue-dark);
+    }
+
+    .primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .primary svg.btn-icon-right {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 20px;
+      height: 20px;
+    }
+
+    .panel-footer {
+      display: flex;
+      gap: 10px;
+      padding: 16px 20px;
+      background: var(--bg-input);
+      border-top: 1px solid var(--border);
+    }
+
+    /* ===== MODAL ===== */
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: rgba(15,23,42,0.6);
+      backdrop-filter: blur(5px);
+      align-items: center;
+      justify-content: center; 
+      padding: 20px;
+    }
+
+    .modal.open {
+      display: flex;
+    }
+    
+    .modal-card {
+      position: relative;
+      width: 100%;
+      max-width: 450px;
+      height: 75vh; 
+      background: var(--bg-card); 
+      border-radius: 20px;
+      padding: 24px 20px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+      display: flex;
+      flex-direction: column;
+      animation: zoomIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+      overflow: hidden;
+    }
+
+    .modal-card.short-modal {
+      height: auto;
+      max-height: 75vh;
+    }
+
+    @keyframes zoomIn { 
+      from { opacity: 0; transform: scale(0.9); } 
+      to { opacity: 1; transform: scale(1); } 
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      flex-shrink: 0;
+    }
+
+    .modal-header h3 {
+      font-size: 16px;
+      font-weight: 800;
+      margin: 0;
+    }
+    
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%; 
+      background: var(--bg-input) !important;
+      color: var(--muted) !important;
+      display: grid;
+      place-items: center;
+      z-index: 10;
+    }
+
+    .modal-close svg {
+      width: 16px;
+      height: 16px;
+      stroke-width: 3;
+    }
+
+    .search-wrap {
+      position: relative;
+      margin-bottom: 20px;
+      flex-shrink: 0;
+    }
+
+    .search-wrap input {
+      width: 100%;
+      height: 48px;
+      border: none;
+      background: var(--bg-input);
+      border-radius: 50px;
+      padding: 0 20px 0 45px;
+      font-family: inherit;
+      font-size: 16px;
+      color: var(--text);
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+    }
+
+    .search-wrap input:focus {
+      outline: 2px solid var(--blue-light);
+    }
+
+    body.dark-mode .search-wrap input:focus {
+      outline: 2px solid rgba(13, 93, 166, 0.5);
+    }
+    
+    .search-wrap svg {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 20px;
+      height: 20px;
+      stroke: var(--muted);
+    }
+
+    .modal-list {
+      overflow-y: auto;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding-bottom: 10px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .list-item {
+      padding: 16px 8px; 
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      transition: background 0.2s;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .list-item:last-child {
+      border-bottom: none;
+    }
+
+    .list-item:hover {
+      background: var(--bg-input);
+    }
+    
+    .list-item.selected {
+      color: var(--blue);
+    }
+
+    body.dark-mode .list-item.selected {
+      color: #60a5fa;
+    }
+    
+    .list-item .check-icon { 
+      display: none;
+      width: 20px;
+      height: 20px;
+      stroke-width: 2.5;
+      color: var(--blue);
+    }
+
+    body.dark-mode .list-item .check-icon {
+      color: #60a5fa;
+    }
+
+    .list-item.selected .check-icon {
+      display: block;
+    }
+    
+    .empty-search {
+      text-align: center;
+      padding: 30px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* ===== TOAST ===== */
+    .toast {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.85);
+      background: var(--green);
+      color: #fff;
+      padding: 14px 20px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 800;
+      z-index: 3000;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.25s ease;
+      width: max-content;
+      max-width: 92vw;
+      text-align: center;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .toast.error {
+      background: #ef4444;
+    }
+
+    /* ===== LOADING OVERLAY ===== */
+    #loadingOverlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15,23,42,0.85);
+      z-index: 9999;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      backdrop-filter: blur(5px);
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid rgba(255,255,255,0.3);
+      border-top: 5px solid #fff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* ===== PREVIEW DATA PAGE ===== */
+    .preview-panel {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-card);
+      overflow: hidden;
+      margin-bottom: 18px;
+    }
+
+    .preview-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 19px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .preview-top h2 {
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .data-list {
+      padding: 0 20px 20px;
+    }
+
+    .data-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      gap: 10px;
+    }
+
+    .data-row:last-child {
+      border-bottom: none;
+    }
+
+    .data-row .label {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .data-row .value {
+      font-size: 12px;
+      font-weight: 700;
+      text-align: right;
+      word-break: break-word;
+      max-width: 60%;
+    }
+
+    .selfie-preview {
+      padding: 0 20px 20px;
+    }
+
+    .selfie-preview-wrap {
+      position: relative;
+      background: #000;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1.5px solid var(--border);
+    }
+
+    .selfie-preview img { 
+      width: 100%; 
+      height: auto; 
+      max-height: 500px; 
+      object-fit: contain; 
+      display: block;
+      border-radius: 12px;
+    }
+
+    .no-selfie-placeholder {
+      text-align: center;
+      padding: 20px;
+      background: var(--bg-input); 
+      border-radius: 12px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .status-indicator {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    .status-indicator.hijau {
+      background: var(--green-light);
+      color: var(--green);
+    }
+
+    .status-indicator.merah {
+      background: rgba(239,68,68,0.1);
+      color: var(--red);
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (min-width: 1024px) {
+      .app-container {
+        max-width: 100%;
+        height: auto;
+        overflow-y: visible;
+      }
+      
+      .topbar-biru {
+        padding: 30px 60px;
+      }
+      
+      .mobile-nav {
+        display: none;
+      }
+      
+      .content-area {
+        padding: 30px 40px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .content-page {
+        display: block !important;
+        width: 100%;
+        max-width: 800px;
+        margin: 0 auto 30px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container" id="appContainer">
+
+  <!-- ===== TOPBAR BA ===== -->
+  <div class="top-bar" id="topBar">
+    <label class="theme-toggle-neu" title="Ubah Tema">
+      <span class="switch-neu">
+        <input type="checkbox" id="themeToggleSwitch" onchange="toggleTheme()">
+        <span class="slider-neu">
+          <span class="mode-text-neu dark">DARK MODE</span>
+          <span class="mode-text-neu light">LIGHT MODE</span>
+          <span class="thumb-neu">
+            <svg class="icon-sun-neu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            <svg class="icon-moon-neu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          </span>
+        </span>
+      </span>
+    </label>
+
+    <div class="top-bar-profile">
+      <div class="top-bar-text">
+        <div class="top-bar-role">Created by</div>
+        <div class="top-bar-name">ASEP SAEPUDIN</div>
+      </div>
+      <img src="https://i.postimg.cc/R0YMVxZK/IMG-20261018-003418.png" alt="Asep" class="top-bar-avatar">
+    </div>
+  </div>
+
+  <!-- ===== HEADER BA ===== -->
+  <div class="sticky-header">
+    <header class="topbar-biru">
+      <div class="brand">
+        <div class="brand-mark">
+          <img src="https://i.ibb.co.com/XfkR6wrZ/Logo-PLN.png" alt="Logo PLN" crossorigin="anonymous">
+        </div>
+        <div class="brand-text">
+          <h1 class="brand-title">ELECTRICITY SERVICES</h1>
+          <p class="brand-sub">PT PLN (Persero) UP3 Cikarang</p>
+          <div class="user-badge">
+            <div class="user-info"><div class="name">KOLEKTING DATA LAPANGAN</div></div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <nav class="mobile-nav" id="mobileNav">
+      <button id="tabForm" class="active" onclick="switchTab(0)">ISI DATA</button>
+      <button id="tabPreview" onclick="switchTab(1)">LIHAT DATA</button>
+    </nav>
+  </div>
+
+  <!-- ===== KONTEN ===== -->
+  <div class="content-area">
+
+    <!-- HALAMAN 1: FORM -->
+    <div class="content-page active" id="page-form">
+
+      <!-- Panel IDPEL -->
+      <div class="panel" id="panelIdpel">
+        <div class="panel-head">
+          <div class="panel-icon">
+            <svg viewBox="0 0 24 24" fill="none">
+              <defs>
+                <linearGradient id="gradPetir" x1="6" y1="2" x2="18" y2="22" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#0D5DA6"/>
+                  <stop offset="1" stop-color="#06B6D4"/>
+                </linearGradient>
+              </defs>
+              <path d="M13 2L4.5 13.5H11L10 22L19.5 10.5H13L13 2Z" fill="url(#gradPetir)"/>
+              <path d="M13 2L4.5 13.5H11" stroke="#FCD34D" stroke-width="1.5" stroke-linecap="round" opacity="0.8"/>
+            </svg>
+          </div>
+          <div>
+            <div class="panel-title">IDPEL</div>
+            <div class="panel-desc">Masukkan IDPEL 12 digit</div>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="field">
+            <div class="input-wrap">
+              <input id="idpel" type="tel" inputmode="numeric" maxlength="12" placeholder=" ID PELANGGAN" autocomplete="off">
+              <button class="clear-input" type="button" onclick="clearField('idpel')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+            <div class="error-text" id="errIdpel">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <span>IDPEL wajib diisi 12 digit</span>
+            </div>
+          </div>
+          
+          <!-- KOLOM INPUT KODE PESAN (CUSTOM SELECT) -->
+          <div class="field" style="margin-top: 17px;">
+            <button type="button" class="custom-select-trigger placeholder" id="triggerKodePesan" onclick="openSelectModal('kodePesan')">
+              <span id="labelKodePesan">PILIH KODE PESAN</span>
+              <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <input type="hidden" id="valKodePesan" value="">
+            <div class="error-text" id="errKodePesan">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <span>Kode pesan wajib dipilih</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel Foto Selfie & GPS -->
+      <div class="panel" id="panelFoto">
+        <div class="panel-head">
+          <div class="panel-icon">
+            <svg viewBox="0 0 24 24" fill="none">
+              <defs>
+                <linearGradient id="gradSelfie" x1="4" y1="4" x2="20" y2="21" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#0D5DA6"/>
+                  <stop offset="1" stop-color="#06B6D4"/>
+                </linearGradient>
+              </defs>
+              <rect x="5" y="2" width="14" height="20" rx="3" fill="url(#gradSelfie)"/>
+              <rect x="7" y="5" width="10" height="14" rx="1.5" fill="#fff" opacity="0.9"/>
+              <circle cx="12" cy="3.5" r="0.8" fill="#0F172A"/>
+              <circle cx="12" cy="10" r="2.5" fill="url(#gradSelfie)"/>
+              <path d="M8 17C8 14.5 9.8 13.5 12 13.5C14.2 13.5 16 14.5 16 17" fill="url(#gradSelfie)"/>
+              <path d="M18 3 L19 5 L21 6 L19 7 L18 9 L17 7 L15 6 L17 5 Z" fill="#FCD34D"/>
+              <path d="M3 8 L3.5 9 L4.5 9.5 L3.5 10 L3 11 L2.5 10 L1.5 9.5 L2.5 9 Z" fill="#F59E0B"/>
+            </svg>
+          </div>
+          <div>
+            <div class="panel-title">FOTO SELFIE </div>
+            <div class="panel-desc">Wajah petugas dan kondisi rumah terlihat jelas !</div>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="upload-box" id="selfieBox" role="button" tabindex="0">
+            <button class="corner-clear" id="clearSelfieBtn" type="button" onclick="clearSelfie(event)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+            <div id="selfieContent">
+              <div class="upload-icon">
+                <svg viewBox="0 0 48 48" fill="none">
+                  <rect x="6" y="12" width="36" height="28" rx="4" fill="#38BDF8"/>
+                  <path d="M16 12L19 7H29L32 12H16Z" fill="#0284C7"/>
+                  <circle cx="24" cy="26" r="9" fill="#F0F9FF"/>
+                  <circle cx="24" cy="26" r="7" fill="#0F172A"/>
+                  <circle cx="24" cy="26" r="4" fill="#06B6D4"/>
+                  <circle cx="21" cy="23" r="1.5" fill="#fff" opacity="0.8"/>
+                  <circle cx="36" cy="18" r="2" fill="#FCD34D"/>
+                </svg>
+              </div>
+              <div class="upload-title">Ketuk untuk buka kamera<br>Pastikan GPS aktif sebelum mengambil foto</div>
+            </div>
+            <img class="upload-preview" id="selfiePreview" alt="Preview Selfie">
+          </div>
+          
+          <!-- ERROR TEXT UNTUK FOTO -->
+          <div class="error-text" id="errSelfie">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span>Foto selfie wajib diambil dulu!</span>
+          </div>
+
+          <!-- TOMBOL DOWNLOAD BACKUP -->
+          <div class="download-backup-wrap" id="downloadBackupWrap">
+            <div class="download-backup-info">
+              Tekan tombol download jika ingin backup foto !
+            </div>
+            <button type="button" class="btn-download-backup" onclick="downloadBackupPhoto()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              Download
+            </button>
+          </div>
+
+          <input type="file" id="inputKamera" accept="image/*" capture="user" hidden>
+
+          <div class="gps-info" id="gpsInfo" role="button" tabindex="0" onclick="initGPS()">
+            <div class="gps-text">
+              <span id="gpsStatus">Mencari sinyal GPS...</span>
+              <span class="coords" id="gpsCoords">Mohon tunggu</span>
+            </div>
+            
+            <div class="gps-icon-wrap" id="gpsIconWrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
+                <circle cx="12" cy="12" r="7"/>
+                <line x1="12" y1="2" x2="12" y2="4"/>
+                <line x1="12" y1="20" x2="12" y2="22"/>
+                <line x1="2" y1="12" x2="4" y2="12"/>
+                <line x1="20" y1="12" x2="22" y2="12"/>
+                <circle cx="12" cy="12" r="2" fill="currentColor"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel Unit & Petugas -->
+      <div class="panel" id="panelPetugas">
+        <div class="panel-head">
+          <div class="panel-icon">
+            <svg viewBox="0 0 24 24" fill="none">
+              <defs>
+                <linearGradient id="gradUser" x1="4" y1="4" x2="20" y2="21" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#0D5DA6"/>
+                  <stop offset="1" stop-color="#06B6D4"/>
+                </linearGradient>
+              </defs>
+              <circle cx="12" cy="8" r="4.5" fill="url(#gradUser)"/>
+              <path d="M4 21C4 17.134 7.582 14 12 14C16.418 14 20 17.134 20 21" fill="url(#gradUser)"/>
+              <circle cx="18.5" cy="17.5" r="3.5" fill="#10B981"/>
+              <path d="M17 17.5L18 18.5L20 16.5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div>
+            <div class="panel-title">DATA PETUGAS</div>
+            <div class="panel-desc">Informasi unit kerja dan petugas lapangan</div>
+          </div>
+        </div>
+        <div class="panel-body">
+          
+          <div class="field">
+            <button type="button" class="custom-select-trigger placeholder" id="triggerUnit" onclick="openSelectModal('unit')">
+              <span id="labelUnit">PILIH UNIT KERJA</span>
+              <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <input type="hidden" id="valUnit" value="">
+            <div class="error-text" id="errUnit">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <span>Unit kerja wajib dipilih</span>
+            </div>
+          </div>
+
+          <div class="field">
+            <button type="button" class="custom-select-trigger placeholder" id="triggerPetugas" onclick="openSelectModal('petugas')">
+              <span id="labelPetugas">PILIH NAMA PETUGAS</span>
+              <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <input type="hidden" id="valPetugas" value="">
+            <div class="error-text" id="errPetugas">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <span>Nama petugas wajib dipilih</span>
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="input-wrap">
+              <input id="namaPbm" type="text" placeholder="KOORDINATOR (AUTO)" readonly>
+            </div>
+          </div>
+        </div>
+        <div class="panel-footer">
+          <button type="button" class="primary" onclick="switchTab(1)">
+            <span>LIHAT DATA</span>
+            <svg class="btn-icon-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- HALAMAN 2: DRAF DATA -->
+    <div class="content-page" id="page-preview">
+      <div class="preview-panel">
+        <div class="preview-top">
+          <h2>HASIL INPUT</h2>
+          <div class="status-indicator merah" id="statusIndicator">
+            <span id="statusText">DATA BELUM LENGKAP</span>
+          </div>
+        </div>
+
+        <div class="data-list">
+          <div class="data-row"><span class="label">IDPEL</span><span class="value" id="prevIdpel">...</span></div>
+          <div class="data-row"><span class="label">KODE PESAN</span><span class="value" id="prevKodePesan">...</span></div>
+          <div class="data-row"><span class="label">UNIT KERJA</span><span class="value" id="prevUnit">...</span></div>
+          <div class="data-row"><span class="label">PETUGAS</span><span class="value" id="prevPetugas">...</span></div>
+          <div class="data-row"><span class="label">KOORDINATOR</span><span class="value" id="prevPbm">...</span></div>
+          <div class="data-row"><span class="label">GPS</span><span class="value" id="prevGps">...</span></div>
+        </div>
+
+        <div class="selfie-preview">
+          <div style="font-size:11px; font-weight:700; margin-bottom:8px; color:var(--muted);">FOTO SELFIE</div>
+          <div class="selfie-preview-wrap" id="selfiePreviewWrap" style="display:none;">
+            <img id="prevSelfie" alt="Foto Selfie">
+          </div>
+          <div id="noSelfie" class="no-selfie-placeholder">Belum ada foto</div>
+        </div>
+
+        <div class="panel-footer" style="justify-content:center;">
+          <button type="button" class="primary" id="submitBtn" onclick="submitData()">
+            <span>KIRIM DATA</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== MODAL PILIHAN ===== -->
+<div class="modal" id="selectModal">
+  <div class="modal-card" id="selectModalCard">
+    <div class="modal-header">
+      <h3 id="modalSelectTitle">Pilih</h3>
+      <button class="modal-close" onclick="closeModal('selectModal')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    
+    <div class="search-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="searchInput" placeholder="Cari data..." oninput="filterList()" autocomplete="off">
+    </div>
+
+    <div class="modal-list" id="modalList"></div>
+  </div>
+</div>
+
+<!-- ===== MODAL PANDUAN GPS ===== -->
+<div class="modal" id="gpsGuideModal">
+  <div class="modal-card" style="height:auto; max-height:85vh;">
+    <div class="modal-header">
+      <h3 style="color:var(--red); display:flex; align-items:center; gap:8px;">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        GPS Diblokir
+      </h3>
+      <button class="modal-close" onclick="closeModal('gpsGuideModal')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    
+    <p style="margin-bottom:20px;">Aplikasi butuh izin lokasi. Silakan ikuti panduan di bawah ini untuk mengaktifkannya:</p>
+    
+    <div style="display:flex; gap:12px; margin-bottom:16px; font-size:12px; line-height:1.6;">
+      <div style="width:24px;height:24px;flex-shrink:0;background:var(--blue-light);color:var(--blue);border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:11px;">1</div>
+      <div>Klik ikon <b>Gembok 🔒</b> atau <b>Titik Tiga (⋮)</b> di sebelah kolom alamat website di atas.</div>
+    </div>
+    <div style="display:flex; gap:12px; margin-bottom:16px; font-size:12px; line-height:1.6;">
+      <div style="width:24px;height:24px;flex-shrink:0;background:var(--blue-light);color:var(--blue);border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:11px;">2</div>
+      <div>Pilih menu <b>Setelan Situs / Izin (Permissions)</b>.</div>
+    </div>
+    <div style="display:flex; gap:12px; margin-bottom:16px; font-size:12px; line-height:1.6;">
+      <div style="width:24px;height:24px;flex-shrink:0;background:var(--blue-light);color:var(--blue);border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:11px;">3</div>
+      <div>Cari opsi <b>Lokasi (Location)</b> dan ubah menjadi <b>Izinkan (Allow)</b>.</div>
+    </div>
+    <div style="display:flex; gap:12px; margin-bottom:0; font-size:12px; line-height:1.6;">
+      <div style="width:24px;height:24px;flex-shrink:0;background:var(--blue-light);color:var(--blue);border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:11px;">4</div>
+      <div>Pastikan <b>GPS di HP</b> sudah dinyalakan, lalu klik kotak GPS di aplikasi untuk mencoba lagi.</div>
+    </div>
+
+    <button type="button" class="primary" style="margin-top: 24px; justify-content: center;" onclick="closeModal('gpsGuideModal'); initGPS();">
+      Coba Lagi
+    </button>
+  </div>
+</div>
+
+<!-- ===== LOADING & TOAST ===== -->
+<div id="loadingOverlay">
+  <div class="spinner"></div>
+  <h3 style="font-size:16px; margin-bottom:8px;">Mengirim Data...</h3>
+  <p style="font-size:12px; color:#cbd5e1; text-align:center; padding:0 20px;">Mohon tunggu, jangan tutup aplikasi.</p>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+
+// ===== KONFIGURASI =====
+const APPS_SCRIPT_URL = "URL_APPS_SCRIPT_KAMU_NANTI";
+
+// ===== DATA MASTER & RELASI =====
+const MASTER_UNIT = ["LEMAHABANG", "CIKARANG", "TAMBUN", "CIBITUNG"];
+
+// KODE PESAN OPSI
+const MASTER_KODE_PESAN = [
+  "ANJING GALAK",
+  "BENCANA",
+  "PEMADAMAN",
+  "RUMAH TUTUP",
+  "STAND DARI PELANGGAN"
+];
+
+const DB_LEMAHABANG = {
+  "IQBAL ILHAMDI": "BADRU SALAM",
+  "M. YUSUP SAPUTRA": "BADRU SALAM",
+  "MASWI": "BADRU SALAM",
+  "MUHAMAD FARHAN SURYA AKBAR": "BADRU SALAM",
+  "MUHAMAD FERIANSYAH": "BADRU SALAM",
+  "MUHAMMAD IQBAL": "BADRU SALAM",
+  "SAHRUL": "BADRU SALAM",
+  "SEPTIAN HARI WIJAYA": "BADRU SALAM",
+  "ALEH JAYADI BIN SAMAN": "BESTON YOHANES SIHOTANG",
+  "ZAKKY ANWAR MAKARIM": "BESTON YOHANES SIHOTANG",
+  "M RIAN RAMDANI": "BESTON YOHANES SIHOTANG",
+  "NARMIN": "BESTON YOHANES SIHOTANG",
+  "NATHA": "BESTON YOHANES SIHOTANG",
+  "SAYYID AKMAL": "BESTON YOHANES SIHOTANG",
+  "SURYANA": "BESTON YOHANES SIHOTANG",
+  "AYUB HASANUDIN": "CEP RAMDANI",
+  "DIDI ISKANDAR": "CEP RAMDANI",
+  "IWAN HERMAWAN": "CEP RAMDANI",
+  "NANANG KOSIM": "CEP RAMDANI",
+  "NURDIN": "CEP RAMDANI",
+  "QAESAR MALDINI": "CEP RAMDANI",
+  "SUNARDI": "CEP RAMDANI",
+  "SURYADI": "CEP RAMDANI",
+  "ARYA ZAINU SYA'BAN": "DEDI SUNDOWO",
+  "DEVIN FADILLAH": "DEDI SUNDOWO",
+  "FAUZI DWIYANTORO WIJAYA": "DEDI SUNDOWO",
+  "HASAN HARIRI": "DEDI SUNDOWO",
+  "IMAM HAMBALI": "DEDI SUNDOWO",
+  "NAILA ZAHRA FEBRIANI": "DEDI SUNDOWO",
+  "SUMINTA": "DEDI SUNDOWO",
+  "ZAENAL ABIDIN": "DEDI SUNDOWO",
+  "AMAN SURATMAN": "HAERUL AMBRI",
+  "ASEP SAEPUDIN": "HAERUL AMBRI",
+  "KARNA MAULANA": "HAERUL AMBRI",
+  "NONGKIN PERMANA": "HAERUL AMBRI",
+  "RIO ARYANTO": "HAERUL AMBRI",
+  "RUDINI": "HAERUL AMBRI",
+  "SAEPUL AHMAD": "HAERUL AMBRI",
+  "AHMAD RIZAL": "IBNU SOFYAN",
+  "WAHYU NURYADI": "IBNU SOFYAN",
+  "M DANIL": "IBNU SOFYAN",
+  "MAHPUD BASIR": "IBNU SOFYAN",
+  "NURPALAH": "IBNU SOFYAN",
+  "RISVAL UVANDRI": "IBNU SOFYAN",
+  "ROSID": "IBNU SOFYAN",
+  "SULAEMAN": "IBNU SOFYAN",
+  "DANI HAMDANI": "MAULANA YUSUF",
+  "GILANG MUHAMMAD RIVALDI": "MAULANA YUSUF",
+  "IDRIS MAULANA": "MAULANA YUSUF",
+  "KARSANA": "MAULANA YUSUF",
+  "LUKMANUL HAKIM": "MAULANA YUSUF",
+  "MUHAMMAD RIDWAN": "MAULANA YUSUF",
+  "SALIM SUDIRMAN": "MAULANA YUSUF",
+  "YULIYANSYAH": "MAULANA YUSUF",
+  "ALDO SUGITA": "RONI IMAM SOPYAN",
+  "AMAD ZARKASIH": "RONI IMAM SOPYAN",
+  "ANJAS": "RONI IMAM SOPYAN",
+  "DEDE SULAEMAN": "RONI IMAM SOPYAN",
+  "ENDANG RUKMANA": "RONI IMAM SOPYAN",
+  "HARI PURNAMA DESTIAN": "RONI IMAM SOPYAN",
+  "JAMALUDIN": "RONI IMAM SOPYAN",
+  "SADAM HUSEN": "RONI IMAM SOPYAN"
+};
+
+const DATABASE_UNIT = {
+  "LEMAHABANG": DB_LEMAHABANG
+};
+
+// ===== STATE =====
+let currentLat = null, currentLng = null, currentAcc = null;
+let selfieDataUrl = "";
+let gpsWatchId = null;
+let gpsReady = false;
+let toastTimer;
+let gpsTimeoutTimer;
+
+let currentSelectType = null;
+let selectedUnit = "";
+let selectedPetugas = "";
+let selectedKodePesan = "";
+
+// ===== HELPER =====
+const $ = id => document.getElementById(id);
+
+function vibrate(ms = 15) { if (navigator.vibrate) navigator.vibrate(ms); }
+
+function showToast(msg, isError = false) {
+  const t = $("toast");
+  t.textContent = msg;
+  t.classList.toggle("error", isError);
+  t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("show"), isError ? 4000 : 2600);
+}
+
+function openModal(id) { vibrate(10); $(id).classList.add("open"); }
+function closeModal(id) { $(id).classList.remove("open"); }
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// ===== FUNGSI SCROLL & TRIGGER EFFECT =====
+function scrollAndHighlight(elem, isDataPetugas, callback) {
+  const container = $('appContainer');
+  if (!container || !elem) return;
+
+  const containerRect = container.getBoundingClientRect();
+  const elemRect = elem.getBoundingClientRect();
+  
+  const scrollTop = container.scrollTop;
+  const targetScroll = scrollTop + (elemRect.top - containerRect.top) - 100;
+
+  container.scrollTo({
+    top: targetScroll,
+    behavior: 'smooth'
+  });
+
+  // Kasih class highlight (tanpa glow, cuma border merah & goyang)
+  const highlightClass = isDataPetugas ? 'highlight-error-lama' : 'highlight-error';
+  const duration = isDataPetugas ? 1300 : 700;
+
+  setTimeout(() => {
+    elem.classList.add(highlightClass);
+    
+    // Hapus class setelah animasi selesai
+    setTimeout(() => {
+      elem.classList.remove(highlightClass);
+      if (callback) callback();
+    }, duration);
+  }, 150);
+}
+
+// ===== TEMA =====
+function getAutoTheme() { const h = new Date().getHours(); return (h >= 18 || h < 6) ? 'dark' : 'light'; }
+function applyTheme(theme) {
+  const isDark = theme === 'dark';
+  document.body.classList.toggle('dark-mode', isDark);
+  const sw = $('themeToggleSwitch'); if (sw) sw.checked = isDark;
+}
+function initTheme() {
+  const saved = localStorage.getItem('themeMode');
+  applyTheme(saved || getAutoTheme());
+}
+function toggleTheme() {
+  const t = $('themeToggleSwitch').checked ? 'dark' : 'light';
+  localStorage.setItem('themeMode', t);
+  applyTheme(t);
+}
+
+// ===== TAB & VALIDASI =====
+function switchTab(i) {
+  vibrate(10);
+  const nav = $('mobileNav');
+  if (window.innerWidth >= 1024) { updatePreview(); return; }
+  
+  if (i === 0) {
+    $('page-form').classList.add('active');
+    $('page-preview').classList.remove('active');
+    nav.classList.remove('show-preview');
+    $('tabForm').classList.add('active');
+    $('tabPreview').classList.remove('active');
+  } else {
+    $('page-preview').classList.add('active');
+    $('page-form').classList.remove('active');
+    nav.classList.add('show-preview');
+    $('tabPreview').classList.add('active');
+    $('tabForm').classList.remove('active');
+    updatePreview();
+  }
+  $('appContainer').scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function validateForm() {
+  let isValid = true;
+  let firstErrorEl = null;
+  let firstErrorIsDataPetugas = false;
+  let firstErrorIsInput = false;
+
+  const idpel = $('idpel').value.trim();
+  if (idpel.length !== 12) {
+    $('idpel').classList.add('input-error');
+    $('errIdpel').classList.add('visible');
+    if (!firstErrorEl) {
+      firstErrorEl = $('panelIdpel');
+      firstErrorIsInput = true;
+      firstErrorIsDataPetugas = false;
+    }
+    isValid = false;
+  } else {
+    $('idpel').classList.remove('input-error');
+    $('errIdpel').classList.remove('visible');
+  }
+
+  if (!selectedKodePesan) {
+    $('triggerKodePesan').classList.add('input-error');
+    $('errKodePesan').classList.add('visible');
+    if (!firstErrorEl) {
+      firstErrorEl = $('panelIdpel');
+      firstErrorIsInput = false;
+      firstErrorIsDataPetugas = false;
+    }
+    isValid = false;
+  } else {
+    $('triggerKodePesan').classList.remove('input-error');
+    $('errKodePesan').classList.remove('visible');
+  }
+
+  if (!selfieDataUrl) {
+    $('selfieBox').classList.add('upload-error');
+    $('errSelfie').classList.add('visible');
+    if (!firstErrorEl) {
+      firstErrorEl = $('panelFoto');
+      firstErrorIsInput = false;
+      firstErrorIsDataPetugas = false;
+    }
+    isValid = false;
+  } else {
+    $('selfieBox').classList.remove('upload-error');
+    $('errSelfie').classList.remove('visible');
+  }
+
+  if (!selectedUnit) {
+    $('triggerUnit').classList.add('input-error');
+    $('errUnit').classList.add('visible');
+    if (!firstErrorEl) {
+      firstErrorEl = $('panelPetugas');
+      firstErrorIsInput = false;
+      firstErrorIsDataPetugas = true;
+    }
+    isValid = false;
+  } else {
+    $('triggerUnit').classList.remove('input-error');
+    $('errUnit').classList.remove('visible');
+  }
+
+  if (!selectedPetugas) {
+    $('triggerPetugas').classList.add('input-error');
+    $('errPetugas').classList.add('visible');
+    if (!firstErrorEl) {
+      firstErrorEl = $('panelPetugas');
+      firstErrorIsInput = false;
+      firstErrorIsDataPetugas = true;
+    }
+    isValid = false;
+  } else {
+    $('triggerPetugas').classList.remove('input-error');
+    $('errPetugas').classList.remove('visible');
+  }
+
+  if (!isValid) {
+    vibrate(30);
+    showToast("Lengkapi data terlebih dahulu !", true);
+    
+    if (!$('page-form').classList.contains('active')) {
+      switchTab(0);
+    }
+    
+    setTimeout(() => {
+      if (firstErrorEl) {
+        scrollAndHighlight(firstErrorEl, firstErrorIsDataPetugas, () => {
+          if (firstErrorIsInput) {
+            const inputEl = firstErrorEl.querySelector('input:not([readonly])');
+            if (inputEl) {
+              inputEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              setTimeout(() => inputEl.focus(), 300);
+            }
+          }
+        });
+      }
+    }, 400);
+  }
+
+  return isValid;
+}
+
+// ===== CUSTOM SELECT LOGIC =====
+function getPetugasList() {
+  if (!selectedUnit) return [];
+  return Object.keys(DATABASE_UNIT[selectedUnit] || {});
+}
+
+function openSelectModal(type) {
+  vibrate(10);
+
+  if (type === 'petugas' && !selectedUnit) {
+    showToast("Pilih Unit Kerja terlebih dahulu!", true);
+    return;
+  }
+
+  currentSelectType = type;
+  let dataToRender = [];
+  const modalCard = $('selectModalCard');
+
+  if (type === 'unit') {
+    $('modalSelectTitle').textContent = 'Pilih Unit Kerja';
+    dataToRender = MASTER_UNIT;
+    modalCard.classList.add('short-modal');
+  } else if (type === 'petugas') {
+    $('modalSelectTitle').textContent = 'Pilih Nama Petugas';
+    dataToRender = getPetugasList();
+    modalCard.classList.remove('short-modal');
+  } else if (type === 'kodePesan') {
+    $('modalSelectTitle').textContent = 'Pilih Kode Pesan';
+    dataToRender = MASTER_KODE_PESAN;
+    modalCard.classList.add('short-modal');
+  }
+
+  $('searchInput').value = "";
+  renderList(dataToRender, type);
+  openModal('selectModal');
+}
+
+function renderList(data, type) {
+  const listContainer = $('modalList');
+  let currentVal = "";
+  
+  if (type === 'unit') currentVal = selectedUnit;
+  else if (type === 'petugas') currentVal = selectedPetugas;
+  else if (type === 'kodePesan') currentVal = selectedKodePesan;
+
+  if (!data || data.length === 0) {
+    listContainer.innerHTML = '<div class="empty-search">Data tidak ditemukan</div>';
+    return;
+  }
+
+  listContainer.innerHTML = data.map((item, idx) => {
+    const isSelected = item === currentVal ? 'selected' : '';
+    return `
+      <div class="list-item ${isSelected}" data-idx="${idx}" data-type="${type}">
+        <span>${escapeHtml(item)}</span>
+        <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+          <polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+      </div>
+    `;
+  }).join('');
+
+  listContainer.querySelectorAll('.list-item').forEach(el => {
+    el.addEventListener('click', () => {
+      const item = data[parseInt(el.dataset.idx, 10)];
+      selectItem(item, el.dataset.type);
+    });
+  });
+}
+
+function filterList() {
+  const query = $('searchInput').value.toLowerCase();
+  let data = [];
+  if (currentSelectType === 'unit') data = MASTER_UNIT;
+  else if (currentSelectType === 'petugas') data = getPetugasList();
+  else if (currentSelectType === 'kodePesan') data = MASTER_KODE_PESAN;
+
+  const filtered = data.filter(item => item.toLowerCase().includes(query));
+  renderList(filtered, currentSelectType);
+}
+
+function selectItem(value, type) {
+  vibrate(15);
+
+  if (type === 'unit') {
+    selectedUnit = value;
+    $('valUnit').value = value;
+    $('labelUnit').textContent = value;
+    $('triggerUnit').classList.remove('placeholder');
+    $('triggerUnit').classList.remove('input-error');
+    $('errUnit').classList.remove('visible');
+
+    selectedPetugas = "";
+    $('valPetugas').value = "";
+    $('labelPetugas').textContent = "Pilih Petugas";
+    $('triggerPetugas').classList.add('placeholder');
+    $('namaPbm').value = "";
+
+  } else if (type === 'petugas') {
+    selectedPetugas = value;
+    $('valPetugas').value = value;
+    $('labelPetugas').textContent = value;
+    $('triggerPetugas').classList.remove('placeholder');
+    $('triggerPetugas').classList.remove('input-error');
+    $('errPetugas').classList.remove('visible');
+
+    const pengawas = (DATABASE_UNIT[selectedUnit] || {})[value] || "";
+    $('namaPbm').value = pengawas;
+  } else if (type === 'kodePesan') {
+    selectedKodePesan = value;
+    $('valKodePesan').value = value;
+    $('labelKodePesan').textContent = value;
+    $('triggerKodePesan').classList.remove('placeholder');
+    $('triggerKodePesan').classList.remove('input-error');
+    $('errKodePesan').classList.remove('visible');
+  }
+
+  closeModal('selectModal');
+  updatePreview();
+}
+
+// ===== GPS =====
+function setGpsState(state, statusText, coordsText) {
+  const box = $('gpsInfo');
+  box.classList.remove('loading', 'ready', 'error', 'spinning');
+  box.classList.add(state);
+  if (statusText) $('gpsStatus').textContent = statusText;
+  if (coordsText !== undefined) $('gpsCoords').textContent = coordsText;
+}
+
+function initGPS() {
+  if (!navigator.geolocation) {
+    setGpsState('error', 'GPS tidak didukung browser', 'Gunakan browser lain');
+    return;
+  }
+
+  const box = $('gpsInfo');
+  box.classList.add('spinning');
+
+  setGpsState('loading', 'Mencari sinyal GPS...', 'Mohon tunggu');
+  gpsReady = false;
+  currentLat = null;
+  updatePreview();
+
+  if (gpsWatchId !== null) navigator.geolocation.clearWatch(gpsWatchId);
+  clearTimeout(gpsTimeoutTimer);
+
+  gpsWatchId = navigator.geolocation.watchPosition(
+    (pos) => {
+      clearTimeout(gpsTimeoutTimer);
+      currentLat = pos.coords.latitude;
+      currentLng = pos.coords.longitude;
+      currentAcc = Math.round(pos.coords.accuracy);
+      gpsReady = true;
+      box.classList.remove('spinning');
+      setGpsState(
+        'ready',
+        `GPS siap ±${currentAcc} m`,
+        `${currentLat.toFixed(6)}, ${currentLng.toFixed(6)}`
+      );
+      updatePreview();
+    },
+    (err) => {
+      clearTimeout(gpsTimeoutTimer);
+      box.classList.remove('spinning');
+      if (err.code === 1) {
+        setGpsState('error', 'AKSES GPS DIBLOKIR', '');
+      } else {
+        setGpsState('error', 'Gagal ambil lokasi', 'Klik untuk coba lagi');
+      }
+      gpsReady = false;
+    },
+    { enableHighAccuracy: true, maximumAge: 0, timeout: 15000 }
+  );
+
+  gpsTimeoutTimer = setTimeout(() => {
+    if (!gpsReady) {
+      box.classList.remove('spinning');
+      setGpsState('error', 'GPS lambat / sinyal lemah', 'Klik untuk coba lagi');
+    }
+  }, 16000);
+}
+
+// ===== KOMPRES FOTO =====
+function compressImage(file, maxDim = 1280, quality = 0.8) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      let { width, height } = img;
+      if (width > maxDim || height > maxDim) {
+        if (width > height) { height = Math.round(height * maxDim / width); width = maxDim; }
+        else { width = Math.round(width * maxDim / height); height = maxDim; }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width; canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+      try {
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      } catch (err) { reject(err); }
+    };
+    img.onerror = reject;
+    img.src = url;
+  });
+}
+
+// ===== KAMERA =====
+function openCameraModal() {
+  vibrate(10);
+  if (!gpsReady) {
+    showToast("Tunggu GPS siap sebelum ambil foto", true);
+    return;
+  }
+  $('inputKamera').click();
+}
+
+$('inputKamera').addEventListener('change', async function(event) {
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+
+  if (!file.type.startsWith("image/")) {
+    showToast("File harus berupa gambar", true);
+    return;
+  }
+
+  try {
+    const compressed = await compressImage(file);
+    selfieDataUrl = compressed;
+
+    $('selfiePreview').src = selfieDataUrl;
+    $('selfieBox').classList.add('has-photo');
+    $('selfieContent').style.display = 'none';
+    $('clearSelfieBtn').style.display = 'flex';
+    $('downloadBackupWrap').classList.add('visible');
+    
+    $('selfieBox').classList.remove('upload-error');
+    $('errSelfie').classList.remove('visible');
+
+    showToast("Foto berhasil disimpan");
+    updatePreview();
+  } catch (err) {
+    showToast("Gagal memproses foto", true);
+  }
+  event.target.value = '';
+});
+
+function clearSelfie(e) {
+  if (e) e.stopPropagation();
+  vibrate(15);
+  selfieDataUrl = "";
+  $('selfiePreview').removeAttribute('src');
+  $('selfieBox').classList.remove('has-photo');
+  $('selfieContent').style.display = 'block';
+  $('clearSelfieBtn').style.display = 'none';
+  $('downloadBackupWrap').classList.remove('visible');
+  updatePreview();
+}
+
+$('selfieBox').addEventListener('click', e => {
+  if (!e.target.closest('#clearSelfieBtn')) openCameraModal();
+});
+
+$('selfieBox').addEventListener('keydown', e => {
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault();
+    if (!e.target.closest('#clearSelfieBtn')) openCameraModal();
+  }
+});
+
+// ===== DOWNLOAD BACKUP =====
+function downloadBackupPhoto() {
+  if (!selfieDataUrl) {
+    showToast("Belum ada foto untuk didownload", true);
+    return;
+  }
+  vibrate(15);
+
+  try {
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+    const filename = `Bukti_Selfie_${timestamp}.jpg`;
+
+    const link = document.createElement('a');
+    link.href = selfieDataUrl;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    showToast("Download berhasil");
+  } catch (err) {
+    showToast("Gagal download: " + err.message, true);
+  }
+}
+
+// ===== IDPEL =====
+function clearField(id) {
+  vibrate(10);
+  $(id).value = "";
+  $(id).classList.remove('input-error');
+  $('errIdpel').classList.remove('visible');
+  updateClearBtn(id);
+  updatePreview();
+}
+
+function updateClearBtn(id) {
+  const input = $(id);
+  const btn = input.parentElement.querySelector('.clear-input');
+  if (btn) btn.classList.toggle('visible', input.value.length > 0);
+}
+
+$('idpel').addEventListener('input', e => {
+  e.target.value = e.target.value.replace(/\D/g, '');
+  if (e.target.value.length > 0) {
+    e.target.classList.remove('input-error');
+    $('errIdpel').classList.remove('visible');
+  }
+  updateClearBtn('idpel');
+  updatePreview();
+});
+
+// ===== PREVIEW =====
+function updatePreview() {
+  const idpel = $('idpel').value.trim();
+  const pbm = $('namaPbm').value;
+
+  $('prevIdpel').textContent = idpel || '...';
+  $('prevKodePesan').textContent = selectedKodePesan || '...';
+  $('prevUnit').textContent = selectedUnit || '...';
+  $('prevPetugas').textContent = selectedPetugas || '...';
+  $('prevPbm').textContent = pbm || '...';
+  $('prevGps').textContent = currentLat ? `${currentLat.toFixed(6)}, ${currentLng.toFixed(6)}` : '...';
+
+  if (selfieDataUrl) {
+    $('prevSelfie').src = selfieDataUrl;
+    $('selfiePreviewWrap').style.display = 'block';
+    $('noSelfie').style.display = 'none';
+  } else {
+    $('selfiePreviewWrap').style.display = 'none';
+    $('noSelfie').style.display = 'block';
+  }
+
+  const isComplete = idpel.length === 12 && selectedKodePesan && selectedUnit && selectedPetugas && pbm && selfieDataUrl && currentLat;
+  const ind = $('statusIndicator');
+  ind.classList.toggle('hijau', isComplete);
+  ind.classList.toggle('merah', !isComplete);
+  $('statusText').textContent = isComplete ? 'DATA LENGKAP' : 'DATA BELUM LENGKAP';
+}
+
+// ===== RIWAYAT IDPEL =====
+function isIdpelDuplicate(idpel) {
+  try {
+    const history = JSON.parse(localStorage.getItem('riwayatIdpel') || '[]');
+    return history.includes(idpel);
+  } catch { return false; }
+}
+function addIdpelToHistory(idpel) {
+  try {
+    const history = JSON.parse(localStorage.getItem('riwayatIdpel') || '[]');
+    history.push(idpel);
+    localStorage.setItem('riwayatIdpel', JSON.stringify(history.slice(-200)));
+  } catch {}
+}
+
+// ===== RESET FORM =====
+function resetForm() {
+  $('idpel').value = '';
+  updateClearBtn('idpel');
+  $('idpel').classList.remove('input-error');
+  $('errIdpel').classList.remove('visible');
+
+  selectedKodePesan = '';
+  $('valKodePesan').value = '';
+  $('labelKodePesan').textContent = 'PILIH KODE PESAN';
+  $('triggerKodePesan').classList.add('placeholder');
+  $('triggerKodePesan').classList.remove('input-error');
+  $('errKodePesan').classList.remove('visible');
+
+  selfieDataUrl = '';
+  $('selfiePreview').removeAttribute('src');
+  $('selfieBox').classList.remove('has-photo');
+  $('selfieBox').classList.remove('upload-error');
+  $('errSelfie').classList.remove('visible');
+  $('selfieContent').style.display = 'block';
+  $('clearSelfieBtn').style.display = 'none';
+  $('downloadBackupWrap').classList.remove('visible');
+
+  selectedUnit = ''; selectedPetugas = '';
+  $('valUnit').value = ''; $('valPetugas').value = '';
+  $('labelUnit').textContent = 'Pilih Unit Kerja';
+  $('labelPetugas').textContent = 'Pilih Petugas';
+  $('triggerUnit').classList.add('placeholder');
+  $('triggerPetugas').classList.add('placeholder');
+  $('triggerUnit').classList.remove('input-error');
+  $('triggerPetugas').classList.remove('input-error');
+  $('errUnit').classList.remove('visible');
+  $('errPetugas').classList.remove('visible');
+  $('namaPbm').value = '';
+
+  updatePreview();
+  switchTab(0);
+  $('appContainer').scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ===== SUBMIT =====
+async function submitData() {
+  vibrate(20);
+  
+  if (!validateForm()) return;
+
+  const idpel = $('idpel').value.trim();
+
+  if (isIdpelDuplicate(idpel)) {
+    if (!confirm("IDPEL ini sudah pernah dikirim. Lanjutkan?")) return;
+  }
+
+  if (!navigator.onLine) {
+    showToast("Tidak ada koneksi internet. Coba lagi nanti.", true);
+    return;
+  }
+
+  $('loadingOverlay').style.display = 'flex';
+  $('submitBtn').disabled = true;
+
+  try {
+    const payload = {
+      idpel,
+      kodePesan: selectedKodePesan,
+      unit: selectedUnit,
+      petugas: selectedPetugas,
+      pengawas: $('namaPbm').value,
+      lat: currentLat,
+      lng: currentLng,
+      accuracy: currentAcc,
+      selfie: selfieDataUrl,
+      timestamp: new Date().toISOString(),
+    };
+
+    if (APPS_SCRIPT_URL.includes("URL_APPS_SCRIPT")) {
+      await new Promise(res => setTimeout(res, 1200));
+      console.log("[SIMULASI] Payload:", payload);
+    } else {
+      const res = await fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        body: JSON.stringify(payload),
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+      });
+      const result = await res.json();
+      if (!result.success) throw new Error(result.message || "Gagal kirim ke server");
+    }
+
+    addIdpelToHistory(idpel);
+    confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#0D5DA6', '#10b981', '#f59e0b', '#ef4444'] });
+    showToast("✅ Data berhasil dikirim!");
+    setTimeout(resetForm, 800);
+  } catch (err) {
+    showToast("Gagal kirim: " + err.message, true);
+  } finally {
+    $('loadingOverlay').style.display = 'none';
+    $('submitBtn').disabled = false;
+  }
+}
+
+// ===== HANDLE TOMBOL BACK HP =====
+window.addEventListener('popstate', function() {
+  const modal = $('selectModal');
+  if (modal && modal.classList.contains('open')) {
+    closeModal('selectModal');
+  }
+});
+
+// ===== EVENT LIFECYCLE =====
+window.addEventListener('beforeunload', () => {
+  if (gpsWatchId !== null) navigator.geolocation.clearWatch(gpsWatchId);
+});
+
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    if (gpsWatchId !== null) { navigator.geolocation.clearWatch(gpsWatchId); gpsWatchId = null; }
+  } else {
+    if (gpsWatchId === null) initGPS();
+  }
+});
+
+// ===== INIT =====
+initTheme();
+initGPS();
+updatePreview();
+</script>
+
+</body>
+</html>
